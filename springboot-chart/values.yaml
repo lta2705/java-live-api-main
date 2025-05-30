@@ -1,0 +1,43 @@
+image:
+  repository: lta2705/java_app
+  pullPolicy: IfNotPresent
+  tag: "1.0.0"
+springboot:
+  replicas: 1
+  image: lta2705/java_app:1.0.0
+
+service:
+  type: NodePort
+  port: 80
+  nodePort: 30007
+
+containerPort: 8080
+
+
+postgres:
+  image: postgres:15-alpine
+  username: postgres
+  password: admin
+  database: demo
+  port: 5432
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 80
+
+serviceAccount:
+  create: true
+  name: ""

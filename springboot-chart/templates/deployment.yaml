@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: springboot
+spec:
+  replicas: {{ .Values.springboot.replicas }}
+  selector:
+    matchLabels:
+      app: springboot
+  template:
+    metadata:
+      labels:
+        app: springboot
+    spec:
+      containers:
+        - name: springboot
+          image: {{ .Values.springboot.image }}
+          ports:
+            - containerPort: {{ .Values.containerPort }}
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://postgres:5432/{{ .Values.postgres.database }}
+            - name: SPRING_DATASOURCE_USERNAME
+              value: {{ .Values.postgres.username }}
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: {{ .Values.postgres.password }}
