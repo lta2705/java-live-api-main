@@ -1,26 +1,39 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: springboot
+  name: java-app
 spec:
-  replicas: {{ .Values.springboot.replicas }}
+  replicas: 1
   selector:
     matchLabels:
-      app: springboot
+      app: java-app
   template:
     metadata:
       labels:
-        app: springboot
+        app: java-app
     spec:
       containers:
-        - name: springboot
-          image: {{ .Values.springboot.image }}
+        - name: java-app
+          image: {{ .Values.javaApp.image }}
+          imagePullPolicy: Always
           ports:
-            - containerPort: {{ .Values.containerPort }}
+            - containerPort: {{ .Values.javaApp.port }}
           env:
-            - name: SPRING_DATASOURCE_URL
-              value: jdbc:postgresql://postgres:5432/{{ .Values.postgres.database }}
-            - name: SPRING_DATASOURCE_USERNAME
-              value: {{ .Values.postgres.username }}
-            - name: SPRING_DATASOURCE_PASSWORD
-              value: {{ .Values.postgres.password }}
+            - name: DATABASE_URL
+              value: "{{ .Values.javaApp.env.DATABASE_URL }}"
+            - name: DATABASE_USERNAME
+              value: "{{ .Values.javaApp.env.DATABASE_USERNAME }}"
+            - name: DATABASE_PASSWORD
+              value: "{{ .Values.javaApp.env.DATABASE_PASSWORD }}"
+          volumeMounts:
+            - name: config-volume
+              mountPath: /run/src/main/resources/application.properties
+              subPath: application.properties
+              readOnly: true
+      volumes:
+        - name: config-volume
+          configMap:
+            name: springboot-configmaps
+            items:
+                - key: application.properties
+                  path: application.properties

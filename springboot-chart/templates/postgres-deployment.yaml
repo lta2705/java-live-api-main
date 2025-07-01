@@ -1,26 +1,32 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: postgres
+  name: java-db
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: postgres
+      app: java-db
   template:
     metadata:
       labels:
-        app: postgres
+        app: java-db
     spec:
       containers:
-        - name: postgres
-          image: {{ .Values.postgres.image }}
-          env:
-            - name: POSTGRES_DB
-              value: {{ .Values.postgres.database }}
-            - name: POSTGRES_USER
-              value: {{ .Values.postgres.username }}
-            - name: POSTGRES_PASSWORD
-              value: {{ .Values.postgres.password }}
+        - name: java-db
+          image: {{ .Values.javaDb.image }}
           ports:
-            - containerPort: {{ .Values.postgres.port }}
+            - containerPort: {{ .Values.javaDb.port }}
+          env:
+            - name: POSTGRES_USER
+              value: "{{ .Values.javaDb.username }}"
+            - name: POSTGRES_PASSWORD
+              value: "{{ .Values.javaDb.password }}"
+            - name: POSTGRES_DB
+              value: "{{ .Values.javaDb.dbname }}"
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: db-storage
+      volumes:
+        - name: db-storage
+          emptyDir: { }

@@ -4,7 +4,11 @@ import java.util.List;
 
 import com.example.live.repository.UserRepository;
 import com.example.live.entity.User;
+import com.example.live.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,41 +22,48 @@ import org.springframework.web.bind.annotation.PutMapping;
 @RequestMapping("/api/users")
 public class UserController {
 
+  static Logger logger = LoggerFactory.getLogger(UserController.class);
+
   @Autowired
-  private UserRepository userRepository;
+  private UserService userService;
 
   @GetMapping
   public List<User> getAllUsers() {
-    return userRepository.findAll();
+    return userService.findAll();
   } 
 
   @GetMapping("/{id}")
   public User getUserById(@PathVariable Long id) {
-    return userRepository.findById(id).get();
+    return userService.findById(id);
   }
 
   @PostMapping
   public User createUser(@RequestBody User user) {
-    return userRepository.save(user);
+    return userService.createUser(user);
   }
   
   @PutMapping("/{id}")
-  public User updateUser(@PathVariable Long id, @RequestBody User user) {
-    User existingUser = userRepository.findById(id).get();
-    existingUser.setName(user.getName());
-    existingUser.setEmail(user.getEmail());
-    return userRepository.save(existingUser);
+  public void updateUser(@PathVariable Long id, @RequestBody User user) {
+    try {
+      if(user != null && user.getId() != null && user.getId().equals(id)) {
+        userService.updateUser(user);
+      } else {
+        throw new IllegalArgumentException("User ID mismatch");
+      }
+    }catch (IllegalArgumentException e){
+      logger.info("Error updating user: {}", e.getMessage());
+    }
   }
 
   @DeleteMapping("/{id}")
   public String deleteUser(@PathVariable Long id) {
     try {
-      userRepository.findById(id).get();
-      userRepository.deleteById(id);
+      userService.deleteById(id);
       return "User deleted successfully";
     } catch (Exception e) {
       return "User not found";
     }
   }
+
   
 }

@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: java-tcp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: java-tcp
+  template:
+    metadata:
+      labels:
+        app: java-tcp
+    spec:
+      containers:
+        - name: java-tcp
+          image: {{.Values.javaApp.image}}
+          ports:
+            - containerPort: {{ .Values.tcpService.port }}
+          env:
+            - name: TCP_SERVER_PORT
+              value: "{{ .Values.tcpService.port }}"
+
+

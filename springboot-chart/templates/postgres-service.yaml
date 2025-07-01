@@ -1,10 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: postgres
+  name: java-db
 spec:
+  type: ClusterIP
   selector:
-    app: postgres
+    app: java-db
   ports:
-    - port: {{ .Values.postgres.port }}
-  type: {{ .Values.service.nodePort }}
+    - port: 5432
+      targetPort: {{ .Values.javaDb.port }}
