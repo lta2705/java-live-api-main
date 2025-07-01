@@ -22,5 +22,18 @@ tcpService:
   enabled: true
   port: 9000
   targetPort: 9000
-  type: NodePort
-  nodePort: 30999
+  type: LoadBalancer
+#  nodePort: 30999
+
+
+#PORT
+#172.16.26.132:5432
+
+Redis:
+    enabled: true
+    image: redis:alpine
+    port: 6379
+    persistence:
+        enabled: true
+        storageClass: ""
+        size: 1Gi
